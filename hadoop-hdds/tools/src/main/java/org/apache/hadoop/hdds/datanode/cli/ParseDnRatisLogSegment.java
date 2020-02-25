@@ -21,6 +21,7 @@ import org.apache.hadoop.ozone.container.common.transport.server
     .ratis.ContainerStateMachine;
 import org.apache.ratis.proto.RaftProtos.StateMachineLogEntryProto;
 import org.apache.ratis.protocol.RaftGroupId;
+import org.apache.ratis.thirdparty.com.google.protobuf.ByteString;
 import org.apache.ratis.tools.ParseRatisLog;
 import picocli.CommandLine;
 
@@ -36,17 +37,19 @@ public class ParseDnRatisLogSegment implements Runnable {
   @CommandLine.Option(names = {"-s", "--segmentPath"}, required = true,
       description = "Path of the segment file")
   private static File segmentFile;
+  private static final RaftGroupId dummyPipelineId =
+      RaftGroupId.valueOf(ByteString.copyFromUtf8("ADummyRatisGroup"));
 
   private static String smToContainerLogString(
       StateMachineLogEntryProto logEntryProto) {
     return ContainerStateMachine.
-        smProtoToString(RaftGroupId.randomId(), null, logEntryProto);
+        smProtoToString(dummyPipelineId, null, logEntryProto);
   }
 
-  public void run() {
+  public static void parseRatisLogs(File f) {
     try {
       ParseRatisLog.Builder builder = new ParseRatisLog.Builder();
-      builder.setSegmentFile(segmentFile);
+      builder.setSegmentFile(f);
       builder.setSMLogToString(ParseDnRatisLogSegment::smToContainerLogString);
 
       ParseRatisLog prl = builder.build();
@@ -55,6 +58,10 @@ public class ParseDnRatisLogSegment implements Runnable {
       System.out.println(ParseDnRatisLogSegment.class.getSimpleName()
           + "failed with exception  " + e.toString());
     }
+  }
+
+  public void run() {
+    parseRatisLogs(segmentFile);
   }
 
 
