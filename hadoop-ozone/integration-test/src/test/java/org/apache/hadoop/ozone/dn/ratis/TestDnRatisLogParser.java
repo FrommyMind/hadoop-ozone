@@ -56,15 +56,16 @@ public class TestDnRatisLogParser {
   public void testRatisLogParsing() {
     cluster.stop();
     Configuration conf = cluster.getHddsDatanodes().get(0).getConf();
-    String path = conf.get(OzoneConfigKeys.DFS_CONTAINER_RATIS_DATANODE_STORAGE_DIR);
+    String path =
+        conf.get(OzoneConfigKeys.DFS_CONTAINER_RATIS_DATANODE_STORAGE_DIR);
     UUID pid = cluster.getStorageContainerManager().getPipelineManager()
         .getPipelines().get(0).getId().getId();
-    File p = new File(path, pid.toString());
-    File p2 = new File(p, "current");
-    File p3 = new File(p2, "log_inprogress_0");
-    Assert.assertTrue(p3.exists());
-    Assert.assertTrue(p3.isFile());
+    File pipelineDir = new File(path, pid.toString());
+    File currentDir = new File(pipelineDir, "current");
+    File logFile = new File(currentDir, "log_inprogress_0");
+    Assert.assertTrue(logFile.exists());
+    Assert.assertTrue(logFile.isFile());
 
-    ParseDnRatisLogSegment.parseRatisLogs(p3);
+    ParseDnRatisLogSegment.parseRatisLogs(logFile);
   }
 }

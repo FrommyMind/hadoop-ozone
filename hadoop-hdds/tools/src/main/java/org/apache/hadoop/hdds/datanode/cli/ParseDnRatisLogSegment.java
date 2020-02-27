@@ -37,13 +37,13 @@ public class ParseDnRatisLogSegment implements Runnable {
   @CommandLine.Option(names = {"-s", "--segmentPath"}, required = true,
       description = "Path of the segment file")
   private static File segmentFile;
-  private static final RaftGroupId dummyPipelineId =
+  private static final RaftGroupId DUMMY_PIPELINE_ID =
       RaftGroupId.valueOf(ByteString.copyFromUtf8("ADummyRatisGroup"));
 
   private static String smToContainerLogString(
       StateMachineLogEntryProto logEntryProto) {
     return ContainerStateMachine.
-        smProtoToString(dummyPipelineId, null, logEntryProto);
+        smProtoToString(DUMMY_PIPELINE_ID, null, logEntryProto);
   }
 
   public static void parseRatisLogs(File f) {
